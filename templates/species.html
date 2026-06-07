@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block title %}Spesies Lamun · Clovisea{% endblock %}
+{% block content %}
+<div class="section-label rise">Spesies Lamun</div>
+<h1 class="display rise" style="font-size:clamp(1.8rem,6vw,2.6rem);margin-bottom:1.2rem">Enam jenis yang dikenali</h1>
+<div class="grid-2 rise">
+  {% for s in species %}
+    {% set p = s.name.split(' ') %}
+    <a class="sp" href="{{ url_for('species_detail', sid=s.id) }}">
+      <div class="thumb" style="background-image:url('{{ url_for('static', filename='img/species_' ~ s.id ~ '.jpg') }}')">
+        <div class="lab"><div class="g">{{ p[0] }}</div><div class="e">{{ p[1] }}</div></div>
+      </div>
+    </a>
+  {% endfor %}
+</div>
+{% endblock %}

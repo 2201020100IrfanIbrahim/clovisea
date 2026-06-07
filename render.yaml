@@ -1,0 +1,12 @@
+services:
+  - type: web
+    name: silamun
+    runtime: python
+    plan: free
+    buildCommand: "pip install -r requirements.txt"
+    # 1 worker saja: model dimuat sekali, hemat RAM (penting di tier free 512MB).
+    # timeout dinaikkan karena inferensi CPU + cold start bisa beberapa detik.
+    startCommand: "gunicorn app:app --workers 1 --threads 2 --timeout 120 --bind 0.0.0.0:$PORT"
+    envVars:
+      - key: PYTHON_VERSION
+        value: "3.11.9"

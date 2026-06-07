@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block title %}Profil Penulis · Clovisea{% endblock %}
+{% block content %}
+<div class="profile rise">
+  <img class="avatar" src="{{ url_for('static', filename='img/author.jpg') }}" alt="{{ a.nama }}"
+       onerror="this.src='';this.innerHTML='';this.style.background='var(--accent-soft)'">
+  <div class="nm">{{ a.nama }}</div>
+  <div class="role">{{ a.jurusan }} &middot; {{ a.kampus }}</div>
+</div>
+<div class="card panel rise">
+  <h3><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg> Biografi</h3>
+  <dl><dt>Nama</dt><dd>{{ a.nama }}</dd><dt>NIM</dt><dd>{{ a.nim }}</dd><dt>Jurusan</dt><dd>{{ a.jurusan }}</dd><dt>Kampus</dt><dd>{{ a.kampus }}</dd></dl>
+  <p style="margin-top:.8rem">{{ a.bio }}</p>
+</div>
+{% endblock %}

@@ -1,0 +1,101 @@
+{% extends "base.html" %}
+{% block title %}Clovisea · Identifikasi Lamun{% endblock %}
+{% block content %}
+
+<section class="hero rise">
+  <span class="eyebrow">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+    6 spesies lamun &middot; CenterNet
+  </span>
+  <h1>Kenali <em>lamun</em><br>dari satu foto</h1>
+  <p>Unggah atau ambil foto padang lamun, dan model mendeteksi serta menandai jenis lamun yang terlihat.</p>
+</section>
+
+<form action="{{ url_for('detect') }}" method="post" enctype="multipart/form-data" id="form" class="card upload-card rise">
+  <label class="drop" id="drop" for="image">
+    <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 16V4m0 0 4 4m-4-4L8 8"/><path d="M4 16v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"/></svg>
+    <h3>Letakkan / pilih foto</h3>
+    <p>JPG, JPEG, atau PNG &middot; maks 8 MB</p>
+    <input type="file" name="image" id="image" class="hide" accept=".jpg,.jpeg,.png">
+    <img id="preview" alt="pratinjau">
+  </label>
+
+  <div class="actions">
+    <button type="button" class="btn btn-ghost" id="pickBtn">
+      <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10"/><path d="m3 16 5-5 4 4"/><circle cx="9" cy="9" r="1.5"/></svg>
+      Galeri
+    </button>
+    <button type="button" class="btn btn-ghost" id="camBtn">
+      <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3Z"/><circle cx="12" cy="13" r="3.5"/></svg>
+      Kamera
+    </button>
+  </div>
+
+  <button type="submit" class="btn btn-primary btn-block" id="goBtn">
+    <span class="spinner hide" id="sp"></span><span id="goText">Deteksi Lamun</span>
+  </button>
+</form>
+
+<div style="margin-top:2.2rem" class="rise">
+  <div class="section-label">Jelajahi</div>
+  <div class="feature-grid">
+    <a class="feature" href="{{ url_for('species_list') }}">
+      <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z"/><path d="M2 21c0-3 1.85-5.36 5.08-6"/></svg>
+      <span class="t">Spesies Lamun</span><span class="d">Info & taksonomi 6 jenis</span>
+    </a>
+    <a class="feature" href="{{ url_for('location') }}">
+      <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
+      <span class="t">Lokasi Penelitian</span><span class="d">Pulau Bintan</span>
+    </a>
+    <a class="feature" href="{{ url_for('author') }}">
+      <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg>
+      <span class="t">Profil Penulis</span><span class="d">Tentang pengembang</span>
+    </a>
+  </div>
+</div>
+
+<div style="margin-top:2.2rem" class="rise">
+  <div class="section-label">Spesies yang dikenali</div>
+  <div class="grid-2">
+    {% for s in species %}
+      {% set p = s.name.split(' ') %}
+      <a class="sp" href="{{ url_for('species_detail', sid=s.id) }}">
+        <div class="thumb" style="background-image:url('{{ url_for('static', filename='img/species_' ~ s.id ~ '.jpg') }}')">
+          <div class="lab"><div class="g">{{ p[0] }}</div><div class="e">{{ p[1] }}</div></div>
+        </div>
+      </a>
+    {% endfor %}
+  </div>
+</div>
+
+<div class="modal" id="modal">
+  <video id="video" autoplay playsinline></video>
+  <div class="row">
+    <button type="button" class="btn btn-primary" id="shoot">Ambil Foto</button>
+    <button type="button" class="btn btn-ghost" id="closeCam" style="background:#fff;color:var(--ink)">Tutup</button>
+  </div>
+</div>
+<canvas id="canvas" class="hide"></canvas>
+{% endblock %}
+
+{% block scripts %}
+<script>
+const input=document.getElementById('image'),preview=document.getElementById('preview'),
+      go=document.getElementById('goBtn'),drop=document.getElementById('drop');
+function show(f){if(!f)return;drop.classList.add('hot');go.style.display='flex';
+  const r=new FileReader();r.onload=e=>{preview.src=e.target.result;preview.style.display='block';};r.readAsDataURL(f);}
+document.getElementById('pickBtn').onclick=()=>input.click();
+input.onchange=()=>show(input.files[0]);
+['dragover','dragenter'].forEach(ev=>drop.addEventListener(ev,e=>{e.preventDefault();drop.classList.add('hot');}));
+drop.addEventListener('dragleave',()=>{if(!input.files.length)drop.classList.remove('hot');});
+drop.addEventListener('drop',e=>{e.preventDefault();if(e.dataTransfer.files.length){input.files=e.dataTransfer.files;show(input.files[0]);}});
+document.getElementById('form').addEventListener('submit',()=>{document.getElementById('sp').classList.remove('hide');document.getElementById('goText').textContent='Memproses...';go.disabled=true;});
+
+// kamera
+const modal=document.getElementById('modal'),video=document.getElementById('video'),canvas=document.getElementById('canvas');let stream=null;
+document.getElementById('camBtn').onclick=async()=>{try{stream=await navigator.mediaDevices.getUserMedia({video:{facingMode:'environment'}});video.srcObject=stream;modal.classList.add('open');}catch(e){alert('Tidak dapat mengakses kamera. Pastikan izin diaktifkan dan halaman dibuka via HTTPS/localhost.');}};
+function stop(){if(stream)stream.getTracks().forEach(t=>t.stop());modal.classList.remove('open');}
+document.getElementById('closeCam').onclick=stop;
+document.getElementById('shoot').onclick=()=>{canvas.width=video.videoWidth;canvas.height=video.videoHeight;canvas.getContext('2d').drawImage(video,0,0);canvas.toBlob(b=>{const f=new File([b],'kamera.jpg',{type:'image/jpeg'});const dt=new DataTransfer();dt.items.add(f);input.files=dt.files;show(f);stop();},'image/jpeg',.92);};
+</script>
+{% endblock %}

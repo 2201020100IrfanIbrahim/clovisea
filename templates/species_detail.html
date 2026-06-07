@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block title %}{{ s.name }} · Clovisea{% endblock %}
+{% block content %}
+<img class="hero-media rise" src="{{ url_for('static', filename='img/species_' ~ s.id ~ '.jpg') }}" alt="{{ s.name }}"
+     onerror="this.src='';this.style.background='linear-gradient(135deg,#bfe3cd,#5fae87)'">
+<div class="detail-head rise">
+  <div class="g">{{ s.name }}</div>
+  <div class="auth">{{ s.authority }}</div>
+</div>
+
+<div class="two-col">
+  <div class="card panel rise">
+    <h3><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7h18M3 12h18M3 17h18"/></svg> Taksonomi (WoRMS)</h3>
+    <dl>{% for rank,val in s.tax %}<dt>{{ rank }}</dt><dd>{{ val }}</dd>{% endfor %}</dl>
+  </div>
+  <div>
+    <div class="card panel rise">
+      <h3><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z"/></svg> Ciri Morfologi</h3>
+      <dl><dt>Daun</dt><dd>{{ s.daun }}</dd><dt>Rhizoma</dt><dd>{{ s.rhizoma }}</dd><dt>Akar</dt><dd>{{ s.akar }}</dd></dl>
+    </div>
+    <div class="card panel rise">
+      <h3><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg> Deskripsi</h3>
+      <p>{{ s.desc }}</p>
+    </div>
+  </div>
+</div>
+{% endblock %}

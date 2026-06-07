@@ -1,0 +1,11 @@
+{
+  "per_class": {
+    "Cymodocea rotundata": 0.215,
+    "Enhalus acoroides": 0.203,
+    "Halodule uninervis": 0.176,
+    "Halophila ovalis": 0.305,
+    "Syringodium isoetifolium": 0.235,
+    "Thalassia hemprichii": 0.216
+  },
+  "global": 0.225
+}

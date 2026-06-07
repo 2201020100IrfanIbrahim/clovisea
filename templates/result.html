@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+{% block title %}Hasil Deteksi · Clovisea{% endblock %}
+{% block content %}
+
+<div class="result-stage rise">
+  <img id="imgB" class="on" src="{{ bbox_image }}" alt="bounding box">
+  <img id="imgH" src="{{ heat_image }}" alt="heatmap">
+</div>
+
+<div class="seg-wrap rise">
+  <div class="segmented">
+    <button id="tB" class="on">Bounding Box</button>
+    <button id="tH">Heatmap</button>
+  </div>
+</div>
+
+<div class="stat-strip rise">
+  <div class="stat"><div class="n">{{ count }}</div><div class="l">objek terdeteksi</div></div>
+  <div class="stat"><div class="n">{{ summary|length }}</div><div class="l">jenis lamun</div></div>
+  <div class="stat"><div class="n">{{ elapsed }}s</div><div class="l">waktu proses</div></div>
+</div>
+
+{% if summary %}
+  <div class="section-label rise">Rincian — ketuk untuk taksonomi</div>
+  {% for s in summary %}
+  <details class="det rise">
+    <summary>
+      <span class="sw" style="background:rgb({{ s.color[0] }},{{ s.color[1] }},{{ s.color[2] }})"></span>
+      <span class="nm">{{ s.name }}</span>
+      <span class="ct">{{ s.count }} objek</span>
+      <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+    </summary>
+    <div class="body">
+      <dl>{% for rank,val in s.tax %}<dt>{{ rank }}</dt><dd>{{ val }}</dd>{% endfor %}</dl>
+      <div class="auth">Authority: {{ s.authority }} (WoRMS)</div>
+    </div>
+  </details>
+  {% endfor %}
+{% else %}
+  <div class="empty rise">Tidak ada lamun terdeteksi pada citra ini. Coba foto dengan objek lebih jelas atau pencahayaan lebih baik.</div>
+{% endif %}
+{% endblock %}
+
+{% block scripts %}
+<script>
+const iB=document.getElementById('imgB'),iH=document.getElementById('imgH'),tB=document.getElementById('tB'),tH=document.getElementById('tH');
+tB.onclick=()=>{iB.classList.add('on');iH.classList.remove('on');tB.classList.add('on');tH.classList.remove('on');};
+tH.onclick=()=>{iH.classList.add('on');iB.classList.remove('on');tH.classList.add('on');tB.classList.remove('on');};
+</script>
+{% endblock %}

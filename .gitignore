@@ -1,0 +1,7 @@
+__pycache__/
+*.pyc
+static/uploads/*.jpg
+static/uploads/*.png
+!static/uploads/.gitkeep
+venv/
+.venv/
